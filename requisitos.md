@@ -1,4 +1,4 @@
-# Calculadora de tipagens
+﻿# Calculadora de tipagens
 
 ## Objetivos
 o sistema vai ver as tipagens dos Pokémon e calcular suas fraquezas, resitências, imundades e super efetivos. Com um Pokémon de um tipo ou dois tipos diferentes somando as características de cada tipo, assim, conseguindo as características do Pokémon cujo nome foi pesquisado na barra de pesquisa.

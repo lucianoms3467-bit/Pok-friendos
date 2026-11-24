@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Tipagens Pokémon | Pok-friendos</title>
+  
+  <!-- Bootstrap 5 CSS (Mobile-First) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Fonte Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Barra de Navegação Superior (Estilo Pokédex) -->
+  <nav class="navbar navbar-dark navbar-pokedex py-2 sticky-top shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-white fs-4 m-0" href="index.html">
+        <svg class="brand-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#FFFFFF" stroke="#222" stroke-width="4"/>
+          <path d="M2 50 A48 48 0 0 1 98 50 Z" fill="#EE1515"/>
+          <line x1="2" y1="50" x2="98" y2="50" stroke="#222" stroke-width="6"/>
+          <circle cx="50" cy="50" r="16" fill="#FFFFFF" stroke="#222" stroke-width="6"/>
+          <circle cx="50" cy="50" r="8" fill="#FFFFFF" stroke="#999" stroke-width="2"/>
+        </svg>
+        <span>Pok-friendos <span class="badge bg-warning text-dark fs-6 rounded-pill align-middle">Tipagens</span></span>
+      </a>
+
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success-subtle text-success border border-success-subtle d-none d-sm-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 small" title="Pronto para uso">
+          <i class="bi bi-lightning-charge-fill"></i> Calculadora Pronta
+        </span>
+
+        <!-- Botão de Ajuda / Como Funciona (Abre Modal) -->
+        <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3 d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#infoAjudaModal">
+          <i class="bi bi-question-circle-fill"></i>
+          <span class="d-none d-sm-inline">Como Funciona</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+
+    <!-- ==========================================
+         SEÇÃO 1: BARRA DE PESQUISA (MOBILE-FIRST)
+         ========================================== -->
+    <section class="row justify-content-center mb-4">
+      <div class="col-12 col-lg-10">
+        <div class="pokedex-card p-3 p-md-4">
+          <h1 class="h4 fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-search text-danger"></i> Pesquisar Pokémon
+          </h1>
+          <p class="text-muted small mb-3">
+            Digite o nome ou número de qualquer Pokémon para obter automaticamente seus tipos e cálculo de combate.
+          </p>
+
+          <form id="formBuscaPokemon" class="position-relative">
+            <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
+              <span class="input-group-text bg-white border-0 ps-3 text-muted">
+                <i class="bi bi-search"></i>
+              </span>
+              <input 
+                type="text" 
+                id="inputBusca" 
+                class="form-control border-0 ps-2" 
+                placeholder="Ex: Pikachu, Charizard, Lucario, Gengar ou 25..." 
+                autocomplete="off" 
+                required
+              >
+              <button class="btn btn-danger px-4 fw-semibold d-flex align-items-center gap-2" type="submit" id="btnBuscar">
+                <span class="spinner-border spinner-border-sm d-none" id="searchSpinner" role="status" aria-hidden="true"></span>
+                <span>Pesquisar</span>
+              </button>
+            </div>
+
+            <!-- Menu de Autocomplete / Sugestões Dinâmicas -->
+            <div id="sugestoesDropdown" class="sugestoes-dropdown d-none"></div>
+          </form>
+
+          <!-- Botões de Ação Rápida -->
+          <div class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top">
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-1" id="btnAleatorio">
+              <i class="bi bi-dice-5-fill"></i> Pokémon Aleatório
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-1" id="btnLimpar">
+              <i class="bi bi-arrow-counterclockwise"></i> Reiniciar
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-1 ms-auto" data-bs-toggle="collapse" data-bs-target="#seletorManualCollapse">
+              <i class="bi bi-sliders"></i> Seleção Manual de Tipos
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SEÇÃO 2: SELETOR MANUAL DE TIPOS
+         ========================================== -->
+    <section class="row justify-content-center mb-4 collapse" id="seletorManualCollapse">
+      <div class="col-12 col-lg-10">
+        <div class="pokedex-card p-3 p-md-4 border border-primary-subtle bg-light">
+          <h2 class="h5 fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-sliders text-primary"></i> Montar Combinação de Tipos Manualmente
+          </h2>
+          <p class="text-muted small mb-3">
+            Escolha um tipo ou combine dois tipos para simular qualquer Pokémon ou nova criatura.
+          </p>
+
+          <form id="formCalculadoraTipos" class="row g-3 align-items-end">
+            <div class="col-12 col-sm-5">
+              <label for="selectTipo1" class="form-label fw-semibold small text-secondary">Tipo 1 (Primário) *</label>
+              <select id="selectTipo1" class="form-select form-select-lg rounded-3 shadow-sm" required>
+                <option value="Normal">Normal</option>
+                <option value="Fogo" selected>Fogo</option>
+                <option value="Água">Água</option>
+                <option value="Grama">Grama</option>
+                <option value="Elétrico">Elétrico</option>
+                <option value="Gelo">Gelo</option>
+                <option value="Lutador">Lutador</option>
+                <option value="Veneno">Veneno</option>
+                <option value="Terra">Terra</option>
+                <option value="Voador">Voador</option>
+                <option value="Psíquico">Psíquico</option>
+                <option value="Inseto">Inseto</option>
+                <option value="Pedra">Pedra</option>
+                <option value="Fantasma">Fantasma</option>
+                <option value="Dragão">Dragão</option>
+                <option value="Noturno">Noturno</option>
+                <option value="Aço">Aço</option>
+                <option value="Fada">Fada</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-sm-5">
+              <label for="selectTipo2" class="form-label fw-semibold small text-secondary">Tipo 2 (Secundário - Opcional)</label>
+              <select id="selectTipo2" class="form-select form-select-lg rounded-3 shadow-sm">
+                <option value="">(Nenhum - Tipo Puro)</option>
+                <option value="Normal">Normal</option>
+                <option value="Fogo">Fogo</option>
+                <option value="Água">Água</option>
+                <option value="Grama">Grama</option>
+                <option value="Elétrico">Elétrico</option>
+                <option value="Gelo">Gelo</option>
+                <option value="Lutador">Lutador</option>
+                <option value="Veneno">Veneno</option>
+                <option value="Terra">Terra</option>
+                <option value="Voador" selected>Voador</option>
+                <option value="Psíquico">Psíquico</option>
+                <option value="Inseto">Inseto</option>
+                <option value="Pedra">Pedra</option>
+                <option value="Fantasma">Fantasma</option>
+                <option value="Dragão">Dragão</option>
+                <option value="Noturno">Noturno</option>
+                <option value="Aço">Aço</option>
+                <option value="Fada">Fada</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-sm-2">
+              <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-semibold shadow-sm">
+                <i class="bi bi-calculator"></i> Calcular
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SEÇÃO 3: RESULTADOS (CARD DO POKÉMON + EFETIVIDADES)
+         ========================================== -->
+    <section class="row justify-content-center g-4">
+      
+      <!-- Coluna Esquerda: Cartão Detalhado do Pokémon -->
+      <div class="col-12 col-lg-4" id="colunaCardPokemon">
+        <div class="pokedex-card p-4 text-center h-100" id="cardPokemonInfo">
+          
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill fw-bold fs-6" id="pokeNumero">#006</span>
+            <span class="text-muted small"><i class="bi bi-shield-check"></i> Oficial</span>
+          </div>
+
+          <!-- Imagem do Pokémon -->
+          <div class="pokemon-sprite-container mb-3">
+            <img 
+              id="pokeSprite" 
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" 
+              alt="Pokémon" 
+              class="pokemon-sprite"
+            >
+          </div>
+
+          <!-- Nome e Tipagem -->
+          <h2 class="h3 fw-bold text-dark mb-2 text-capitalize" id="pokeNome">Charizard</h2>
+          <div class="d-flex justify-content-center gap-2 mb-4" id="pokeTipos">
+            <span class="badge-tipo tipo-fogo"><i class="bi bi-fire"></i> Fogo</span>
+            <span class="badge-tipo tipo-voador"><i class="bi bi-wind"></i> Voador</span>
+          </div>
+
+          <!-- Altura e Peso -->
+          <div class="row g-2 mb-4 text-center">
+            <div class="col-6">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="text-muted small">Altura</div>
+                <strong class="text-dark" id="pokeAltura">1.7 m</strong>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="text-muted small">Peso</div>
+                <strong class="text-dark" id="pokePeso">90.5 kg</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Atributos Base -->
+          <div class="text-start">
+            <h6 class="fw-bold text-dark mb-3 small text-uppercase">Atributos Base (Stats)</h6>
+            
+            <div class="d-flex align-items-center mb-2">
+              <span class="stat-label">HP</span>
+              <span class="stat-val" id="statValHp">78</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-success" id="statHp" style="width: 30%"></div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+              <span class="stat-label">Ataque</span>
+              <span class="stat-val" id="statValAtk">84</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-warning" id="statAtk" style="width: 44%"></div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+              <span class="stat-label">Defesa</span>
+              <span class="stat-val" id="statValDef">78</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-info" id="statDef" style="width: 34%"></div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+              <span class="stat-label">Sp. Atk</span>
+              <span class="stat-val" id="statValSpAtk">109</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-success" id="statSpAtk" style="width: 56%"></div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+              <span class="stat-label">Sp. Def</span>
+              <span class="stat-val" id="statValSpDef">85</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-info" id="statSpDef" style="width: 37%"></div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <span class="stat-label">Veloc.</span>
+              <span class="stat-val" id="statValSpeed">100</span>
+              <div class="progress flex-grow-1 ms-2">
+                <div class="progress-bar bg-success" id="statSpeed" style="width: 55%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Coluna Direita: Análise Completa de Fraquezas, Resistências e Super Efetivos -->
+      <div class="col-12 col-lg-8">
+        <div class="pokedex-card p-3 p-md-4 h-100" id="resultadoCalculos">
+          
+          <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-3">
+            <div>
+              <h3 class="h4 fw-bold text-dark m-0">Análise de Batalha & Efetividades</h3>
+              <span class="text-muted small">Cálculo de fraquezas, resistências, imunidades e ataques</span>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-sm-0" id="topoTipagemBadges">
+              <span class="badge-tipo badge-tipo-lg tipo-fogo"><i class="bi bi-fire"></i> Fogo</span>
+              <span class="badge-tipo badge-tipo-lg tipo-voador"><i class="bi bi-wind"></i> Voador</span>
+            </div>
+          </div>
+
+          <!-- Indicador de Carregamento -->
+          <div id="loadingSpinner" class="text-center py-4 d-none">
+            <div class="spinner-border text-danger" role="status">
+              <span class="visually-hidden">Calculando...</span>
+            </div>
+            <p class="text-muted small mt-2 mb-0">Calculando matriz de tipos...</p>
+          </div>
+
+          <div class="row g-3">
+
+            <!-- 1. Super Fraquezas (4x) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-danger-subtle bg-danger-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-danger d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-exclamation-octagon-fill"></i> Super Fraquezas (4x Dano)
+                  </strong>
+                  <span class="badge bg-danger rounded-pill">4x</span>
+                </div>
+                <div id="listaSuperFraquezas" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 2. Fraquezas Normais (2x) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-warning-subtle bg-warning-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-warning-emphasis d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Fraquezas (2x Dano)
+                  </strong>
+                  <span class="badge bg-warning text-dark rounded-pill">2x</span>
+                </div>
+                <div id="listaFraquezas" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 3. Resistências (0.5x) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-success-subtle bg-success-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-success d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-shield-fill-check"></i> Resistências (½x Dano)
+                  </strong>
+                  <span class="badge bg-success rounded-pill">0.5x</span>
+                </div>
+                <div id="listaResistencias" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 4. Super Resistências (0.25x) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-info-subtle bg-info-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-info-emphasis d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-shield-shaded"></i> Super Resistências (¼x Dano)
+                  </strong>
+                  <span class="badge bg-info text-dark rounded-pill">0.25x</span>
+                </div>
+                <div id="listaSuperResistencias" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 5. Imunidades (0x Dano) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-secondary-subtle bg-secondary-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-secondary-emphasis d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-slash-circle-fill"></i> Imunidades (Sem Dano)
+                  </strong>
+                  <span class="badge bg-dark rounded-pill">0x</span>
+                </div>
+                <div id="listaImunidades" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 6. Super Efetivo no Ataque (2x STAB) -->
+            <div class="col-12 col-md-6">
+              <div class="efetividade-box h-100 border-primary-subtle bg-primary-subtle bg-opacity-10">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-primary d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-lightning-charge-fill"></i> Super Efetivo no Ataque (STAB)
+                  </strong>
+                  <span class="badge bg-primary rounded-pill">2x Ataque</span>
+                </div>
+                <div id="listaSuperEfetivos" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+            <!-- 7. Dano Neutro (1x) -->
+            <div class="col-12">
+              <div class="efetividade-box">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-secondary d-flex align-items-center gap-1 small text-uppercase">
+                    <i class="bi bi-circle"></i> Dano Normal Neutro (1x Dano)
+                  </strong>
+                  <span class="badge bg-secondary rounded-pill">1x</span>
+                </div>
+                <div id="listaNeutros" class="d-flex flex-wrap align-items-center"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Rodapé Institucional -->
+  <footer class="mt-auto py-4 bg-white border-top">
+    <div class="container text-center">
+      <p class="mb-1 text-muted small">
+        <strong>Calculadora de Tipagens Pokémon</strong> &bull; Projeto 
+        <a href="https://github.com/lucianoms3467-bit/Pok-friendos.git" target="_blank" class="text-decoration-none fw-semibold text-danger">
+          <i class="bi bi-github"></i> Pok-friendos
+        </a>
+      </p>
+      <p class="mb-0 text-secondary" style="font-size: 0.75rem;">
+        Desenvolvido com PHP estruturado, MySQL (PDO), Bootstrap 5 (Mobile-First) e PokeAPI.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Modal Global (Substituto de alert / confirm nativos) -->
+  <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow border-0 rounded-4">
+        <div class="modal-header border-0 pb-0" id="appModalHeader">
+          <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="appModalLabel">
+            <i class="bi bi-info-circle-fill text-primary" id="appModalIcon"></i>
+            <span id="appModalTitle">Aviso</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body py-3" id="appModalBody">
+          <p class="mb-0 text-secondary" id="appModalMessage">Mensagem informativa.</p>
+        </div>
+        <div class="modal-footer border-0 pt-0" id="appModalFooter">
+          <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal" id="appModalCancelBtn" style="display: none;">Cancelar</button>
+          <button type="button" class="btn btn-primary px-4 rounded-pill" data-bs-dismiss="modal" id="appModalConfirmBtn">Entendi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Informativo -->
+  <div class="modal fade" id="infoAjudaModal" tabindex="-1" aria-labelledby="infoAjudaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content shadow border-0 rounded-4">
+        <div class="modal-header bg-danger text-white rounded-top-4">
+          <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="infoAjudaModalLabel">
+            <i class="bi bi-calculator-fill"></i> Como Funciona o Cálculo de Tipagem
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body p-4">
+          <h6 class="fw-bold text-dark mb-2">Multiplicadores Defensivos:</h6>
+          <p class="small text-muted mb-3">Quando o Pokémon sofre um ataque, os multiplicadores de seus dois tipos são multiplicados entre si:</p>
+          <div class="row g-2 mb-4">
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-danger fs-6">4x</span>
+                <span class="small"><strong>Super Fraqueza:</strong> Ambos os tipos sofrem 2x de dano (2 × 2 = 4x).</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark fs-6">2x</span>
+                <span class="small"><strong>Fraqueza:</strong> Dano dobrado contra a combinação defensiva.</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-success fs-6">0.5x</span>
+                <span class="small"><strong>Resistência:</strong> Dano reduzido pela metade contra o golpe.</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-info text-dark fs-6">0.25x</span>
+                <span class="small"><strong>Super Resistência:</strong> Ambos os tipos resistem (0.5 × 0.5 = 0.25x).</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-dark fs-6">0x</span>
+                <span class="small"><strong>Imunidade:</strong> O Pokémon não sofre dano desse tipo de ataque.</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                <span class="badge bg-secondary fs-6">1x</span>
+                <span class="small"><strong>Dano Normal:</strong> Dano neutro padrão sem modificador.</span>
+              </div>
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-dark mb-2">Super Efetivo no Ataque (STAB):</h6>
+          <p class="small text-muted mb-0">Indica contra quais tipagens adversárias este Pokémon causará dano super efetivo (2x) utilizando seus ataques do mesmo tipo (STAB).</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-danger px-4 rounded-pill" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contêiner de Notificações Toast do Bootstrap -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 1090;">
+      <div id="appToast" class="toast align-items-center text-white border-0 shadow-lg rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle-fill fs-5" id="toastIcon"></i>
+            <span id="toastMessage">Notificação do sistema</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <!-- Lógica Principal -->
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
